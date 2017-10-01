@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">RapidoTask</string>
+    <string name="google_maps_key">AIzaSyDAanCkIRYP_C4yysQsQBG4dcrtssRtyAY</string>
+    <string name="cancel">Cancel</string>
+    <string name="gpsmessage">To continue, let your device turn on location, which uses google location service,</string>
+    <string name="copsAlert">Cops Alert</string>
+
+</resources>

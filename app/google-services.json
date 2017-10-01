@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "837846152797",
+    "firebase_url": "https://tripalarm-1505313055869.firebaseio.com",
+    "project_id": "tripalarm-1505313055869",
+    "storage_bucket": "tripalarm-1505313055869.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:837846152797:android:d5cebe34c23464c1",
+        "android_client_info": {
+          "package_name": "com.rapidotask.rapidotask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "837846152797-9cqg25ifb03tf3p9vminvehrfbfv117t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF6UYjgtj9-EeWUCFmQYbDJLGzODyvgvs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    tools:context=".MainActivity">
+
+
+    <fragment
+        android:id="@+id/mapfragment"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/lv_alertlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/margin_5">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:layout_marginTop="@dimen/margin_10"
+            android:onClick="CancelTrip"
+            android:padding="@dimen/margin_10"
+            android:text="@string/cancel"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="@dimen/text_15"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_cops"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:layout_marginBottom="@dimen/margin_10"
+            android:onClick="CopsAlert"
+            android:paddingBottom="@dimen/margin_10"
+            android:text="@string/copsAlert"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="@dimen/text_15"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/colorPrimary"
+        android:visibility="visible" />
+
+
+    <LinearLayout
+        android:id="@+id/lv_triphandle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/tv_source"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_5"
+            android:background="@drawable/shape_search_bg"
+            android:gravity="center|left"
+            android:padding="@dimen/margin_10"
+            android:text="Your location"
+            android:textColor="@color/colorPrimary"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_destination"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_5"
+            android:background="@drawable/shape_search_bg"
+            android:drawableLeft="@drawable/places_ic_search"
+            android:drawablePadding="@dimen/margin_5"
+            android:gravity="center_vertical"
+            android:padding="@dimen/margin_8"
+            android:text="Where to"
+            android:textColor="@color/colorPrimary"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_plan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:layout_margin="@dimen/margin_5"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
+            android:onClick="StartTrip"
+            android:padding="@dimen/margin_10"
+            android:text="Start Trip"
+            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Time.Media"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_20"
+            android:visibility="gone" />
+    </LinearLayout>
+
+
+</FrameLayout>
