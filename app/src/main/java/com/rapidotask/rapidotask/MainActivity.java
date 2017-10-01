@@ -397,24 +397,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
-        for (int i = 0; i < events.size(); i++) {
-            Events item = events.get(i);
-            MarkerOptions temp = new MarkerOptions().
-                    position(item.getLocation())
-                    .title("Cops Alert")
-                    .snippet(item.getPercentage() + " percent chance of presence of cops here.")
-                    .icon(TaskUtil.bitmapDescriptorFromVector(this, R.drawable.ic_siren));
+        if (events != null) {
+            for (int i = 0; i < events.size(); i++) {
+                Events item = events.get(i);
+                MarkerOptions temp = new MarkerOptions().
+                        position(item.getLocation())
+                        .title("Cops Alert")
+                        .snippet(item.getPercentage() + " percent chance of presence of cops here.")
+                        .icon(TaskUtil.bitmapDescriptorFromVector(this, R.drawable.ic_siren));
 
-            Marker tempMarker = mMap.addMarker(temp);
-            cop_markers.add(tempMarker);
+                Marker tempMarker = mMap.addMarker(temp);
+                cop_markers.add(tempMarker);
+            }
         }
     }
 
     public void CopsAlert(View view) {
         JSONObject data = new JSONObject();
         try {
-            data.put("latitude", StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG).latitude);
-            data.put("longitude", StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG).longitude);
+            if (StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG) != null) {
+                data.put("latitude", StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG).latitude);
+                data.put("longitude", StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG).longitude);
+            }
+            else {
+                data.put("latitude", StorageUtil.getInstance(this).getLocation(StorageUtil.SOURCE_LATLONG).latitude);
+                data.put("longitude", StorageUtil.getInstance(this).getLocation(StorageUtil.SOURCE_LATLONG).longitude);
+
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
