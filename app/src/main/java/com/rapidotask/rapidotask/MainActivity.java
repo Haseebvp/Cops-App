@@ -385,6 +385,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if (polyline != null)
                 polyline.remove();
+
+            JSONObject data = new JSONObject();
+            try {
+                data.put("tripKey", StorageUtil.getInstance(this).getTripId());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "stop/trip/", data, "STOPTRIP");
+
         }
     }
 
@@ -678,6 +687,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         } else if (flag.equals("CREATEEVENT")) {
+            String status = object.optString("status");
+            if (status.equals("OK")) {
+                Toast.makeText(getApplicationContext(), "Cops alert recorded...", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
+
+            }
+        } else if (flag.equals("STOPTRIP")) {
             String status = object.optString("status");
             if (status.equals("OK")) {
                 Toast.makeText(getApplicationContext(), "Cops alert recorded...", Toast.LENGTH_SHORT).show();
