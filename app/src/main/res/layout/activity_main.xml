@@ -18,8 +18,8 @@
         android:id="@+id/lv_alertlayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="@dimen/margin_5">
+        android:layout_margin="@dimen/margin_5"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_cancel"
@@ -92,21 +92,34 @@
             android:textColor="@color/colorPrimary"
             android:visibility="visible" />
 
-        <TextView
-            android:id="@+id/tv_plan"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:layout_margin="@dimen/margin_5"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
-            android:onClick="StartTrip"
-            android:padding="@dimen/margin_10"
-            android:text="Start Trip"
-            android:textAppearance="@style/TextAppearance.AppCompat.Notification.Time.Media"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_20"
-            android:visibility="gone" />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tv_plan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center"
+                android:layout_margin="@dimen/margin_5"
+                android:background="@color/colorPrimary"
+                android:gravity="center"
+                android:onClick="StartTrip"
+                android:padding="@dimen/margin_10"
+                android:text="Start Trip"
+                android:textAppearance="@style/TextAppearance.AppCompat.Notification.Time.Media"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_20"
+                android:visibility="visible" />
+
+            <ProgressBar
+                android:id="@+id/trip_progress"
+                android:layout_width="@dimen/margin_30"
+                android:layout_height="@dimen/margin_30"
+                android:layout_gravity="center"
+                android:indeterminateTint="@android:color/white"
+                android:visibility="gone"/>
+        </FrameLayout>
     </LinearLayout>
 
 

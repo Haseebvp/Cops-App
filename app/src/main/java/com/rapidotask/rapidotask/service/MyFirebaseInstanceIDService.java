@@ -19,7 +19,7 @@ import org.json.JSONObject;
  * Created by haseeb on 1/10/17.
  */
 
-public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService implements ApiCommunication{
+public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService implements ApiCommunication {
     private static final String TAG = MyFirebaseInstanceIDService.class.getSimpleName();
     public static int id_device = 0;
 
@@ -27,7 +27,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService imple
     public void onTokenRefresh() {
         super.onTokenRefresh();
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, "onTokenRefresh: "+refreshedToken);
+        Log.d(TAG, "onTokenRefresh: " + refreshedToken);
 
         // Saving reg id to shared preferences
         storeRegIdInPref(refreshedToken);
@@ -37,6 +37,9 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService imple
     }
 
     private void sendRegistrationToServer(final String token) {
+        Log.d(TAG, "sendRegistrationToServer: " + token);
+
+        if (StorageUtil.getInstance(this).getSession() == null) {
             JSONObject data = new JSONObject();
             try {
                 data.put("device_id", TaskUtil.getDeviceId(this));
@@ -46,6 +49,16 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService imple
             }
             StorageUtil.getInstance(this).putFirebase(token);
             ApiService.getInstance(this).post(this, Constants.BASE_URL + "gettoken/", data, "GETTOKEN");
+        } else {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("device_id", MyFirebaseInstanceIDService.id_device);
+                data.put("device_type_id", StorageUtil.getInstance(this).getFirebase());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "updatetoken/", data, "UpdateTOKEN");
+        }
     }
 
     private void storeRegIdInPref(String token) {
@@ -54,21 +67,29 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService imple
 
     @Override
     public void onSuccess(JSONObject object, String flag) {
-        Log.d(TAG, "onSuccess: "+object);
-        try {
-            String status = object.getString("status");
-            if (status.equals("OK")){
-                String token = object.getString("token");
-                StorageUtil.getInstance(this).putSession(token);
+        Log.d(TAG, "onSuccess: " + object);
+        if (flag.equals("GETTOKEN")) {
+            try {
+                String status = object.getString("status");
+                if (status.equals("OK")) {
+                    String token = object.getString("token");
+                    StorageUtil.getInstance(this).putSession(token);
+                    id_device = object.getInt("device");
 
-            }
-            else {
+                } else {
+                    Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+
                 Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        }
+        else if (flag.equals("UpdateTOKEN")){
+            String status = object.optString("status");
+            if (status.equals("OK")) {
 
-            Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

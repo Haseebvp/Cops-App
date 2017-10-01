@@ -55,7 +55,6 @@ public class ApiService {
             Cache cache = new DiskBasedCache(mCtx.getCacheDir(), 10 * 1024 * 1024);
             Network network = new BasicNetwork(new HurlStack());
             mRequestQueue = new RequestQueue(cache, network);
-            // Don't forget to start the volley request queue
             mRequestQueue.start();
         }
         return mRequestQueue;
@@ -63,7 +62,6 @@ public class ApiService {
 
 
     public <T> void addToRequestQueue(Request<T> req, String tag) {
-        // set the default tag if tag is empty
         req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
         getRequestQueue().add(req);
     }
@@ -101,13 +99,14 @@ public class ApiService {
 
 
     public void post(final ApiCommunication listener, String url, JSONObject data, final String flag) {
-        Log.d(TAG, "post: "+StorageUtil.getInstance(mCtx).getSession());
+        Log.d(TAG, "post: "+url);
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                 url, data,
                 new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
+                        Log.d(TAG, "post: "+response);
                         listener.onSuccess(response, flag);
                     }
                 }, new Response.ErrorListener() {

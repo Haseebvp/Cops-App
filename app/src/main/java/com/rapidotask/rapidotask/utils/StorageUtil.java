@@ -114,7 +114,12 @@ public class StorageUtil {
     }
 
     public String getSession() {
-        return preferences.getString(SESSION_ID, "");
+        if (preferences.getString(SESSION_ID, "").length() > 0){
+            return preferences.getString(SESSION_ID, "");
+        }
+        else {
+            return null;
+        }
     }
 
     public void putTripid(String token) {

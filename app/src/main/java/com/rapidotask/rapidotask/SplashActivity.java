@@ -34,7 +34,7 @@ import com.rapidotask.rapidotask.utils.TaskUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class SplashActivity extends AppCompatActivity implements ApiCommunication{
+public class SplashActivity extends AppCompatActivity implements ApiCommunication {
 
     private static String TAG = "SPLASH";
     private static final int REQUEST_LOCATION_PERMISSION = 100;
@@ -67,8 +67,7 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
         if (checkGps()) {
             if (TaskUtil.isNetworkAvailable(this)) {
                 registerDevice();
-            }
-            else {
+            } else {
                 Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
             }
         } else {
@@ -77,7 +76,7 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
 
     }
 
-    private void GoToMain1page(){
+    private void GoToMain1page() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -138,17 +137,28 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
     }
 
 
-//    Api call
-    private void registerDevice(){
+    //    Api call
+    private void registerDevice() {
         progress.setVisibility(View.VISIBLE);
-        JSONObject data = new JSONObject();
-        try {
-            data.put("device_id", TaskUtil.getDeviceId(this));
-            data.put("device_type_id", TaskUtil.getDeviceId(this));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (StorageUtil.getInstance(this).getSession() == null) {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("device_id", TaskUtil.getDeviceId(this));
+                data.put("device_type_id", TaskUtil.getDeviceId(this));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "gettoken/", data, "GETTOKEN");
+        } else {
+            JSONObject data = new JSONObject();
+            try {
+                data.put("device_id", MyFirebaseInstanceIDService.id_device);
+                data.put("device_type_id", StorageUtil.getInstance(this).getFirebase());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "updatetoken/", data, "UpdateTOKEN");
         }
-        ApiService.getInstance(this).post(this, Constants.BASE_URL+"gettoken/",data,"GETTOKEN");
     }
 
 
@@ -157,23 +167,29 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
     @Override
     public void onSuccess(JSONObject object, String flag) {
         progress.setVisibility(View.GONE);
-        Log.d(TAG, "onSuccess: "+object);
-        try {
-            String status = object.getString("status");
-            if (status.equals("OK")){
-                String token = object.getString("token");
-                int id = object.getInt("device");
-                MyFirebaseInstanceIDService.id_device = id;
-                StorageUtil.getInstance(this).putSession(token);
-                GoToMain1page();
-            }
-            else {
+        Log.d(TAG, "onSuccess: " + object);
+        if (flag.equals("GETTOKEN")) {
+            try {
+                String status = object.getString("status");
+                if (status.equals("OK")) {
+                    String token = object.getString("token");
+                    int id = object.getInt("device");
+                    MyFirebaseInstanceIDService.id_device = id;
+                    StorageUtil.getInstance(this).putSession(token);
+                    GoToMain1page();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+
                 Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-
-            Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
+        } else if (flag.equals("UpdateTOKEN")) {
+            String status = object.optString("status");
+            if (status.equals("OK")) {
+                GoToMain1page();
+            }
         }
 
     }
@@ -181,7 +197,7 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
     @Override
     public void onError(VolleyError e, String flag) {
         progress.setVisibility(View.GONE);
-        Log.e(TAG, "onError: ",e);
+        Log.e(TAG, "onError: ", e);
 
         Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
     }

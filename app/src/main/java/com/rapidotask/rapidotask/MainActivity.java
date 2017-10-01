@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<LatLng> pathWaypointsList = new ArrayList<>();
     private Boolean isPaused = false;
 
-    private ProgressBar progressBar;
+    private ProgressBar progressBar, trip_progress;
     private LinearLayout lv_triphandle, lv_alertlayout;
     boolean doubleBackToExitPressedOnce = false;
     ArrayList<JSONObject> pointsToServer = null;
@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         lv_triphandle.setVisibility(View.INVISIBLE);
         tv_cancel = (TextView) findViewById(R.id.tv_cancel);
         lv_alertlayout.setVisibility(View.INVISIBLE);
+        trip_progress = (ProgressBar) findViewById(R.id.trip_progress);
 
         tv_dest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             if (tv_plan.getVisibility() != View.VISIBLE) {
                 tv_plan.setVisibility(View.VISIBLE);
+                tv_plan.setText("Start Trip");
             }
         }
 
@@ -356,10 +358,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void StartTrip(View view) {
         if (!StorageUtil.getInstance(this).getTripStatus()) {
-            tv_dest.setEnabled(false);
-            tv_plan.setVisibility(View.GONE);
-            lv_alertlayout.setVisibility(View.VISIBLE);
-            StorageUtil.getInstance(this).putTripStatus(true);
+            tv_plan.setText("");
+            trip_progress.setVisibility(View.VISIBLE);
             registerTrip(pointsToServer);
         }
 
@@ -677,6 +677,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (flag.equals("STARTTRIP")) {
             String status = object.optString("status");
             if (status.equals("OK")) {
+                trip_progress.setVisibility(View.GONE);
+                tv_dest.setEnabled(false);
+                tv_plan.setVisibility(View.GONE);
+                lv_alertlayout.setVisibility(View.VISIBLE);
+                StorageUtil.getInstance(this).putTripStatus(true);
                 String token = object.optString("tripKey");
                 StorageUtil.getInstance(this).putTripid(token);
                 CheckEvent();
@@ -721,7 +726,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else if (flag.equals("STOPTRIP")) {
             String status = object.optString("status");
             if (status.equals("OK")) {
-                Toast.makeText(getApplicationContext(), "Cops alert recorded...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Cancelling trip", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
 
