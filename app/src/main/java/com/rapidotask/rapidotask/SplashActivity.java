@@ -65,7 +65,12 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
 
     private void Proceed() {
         if (checkGps()) {
-            registerDevice();
+            if (TaskUtil.isNetworkAvailable(this)) {
+                registerDevice();
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
+            }
         } else {
             ShowDialoge();
         }

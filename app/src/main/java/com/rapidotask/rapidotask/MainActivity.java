@@ -392,7 +392,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "stop/trip/", data, "STOPTRIP");
+            if (TaskUtil.isNetworkAvailable(this)) {
+                ApiService.getInstance(this).post(this, Constants.BASE_URL + "stop/trip/", data, "STOPTRIP");
+            }
+            else {
+                Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
+            }
 
         }
     }
@@ -436,8 +441,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        ApiService.getInstance(this).post(this, Constants.BASE_URL + "create/event/", data, "CREATEEVENT");
+        if (TaskUtil.isNetworkAvailable(this)) {
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "create/event/", data, "CREATEEVENT");
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -449,10 +458,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
 
-        if (param.equals("upvote")) {
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "upvote/event/", data, "UPVOTE");
-        } else {
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "downvote/event/", data, "DOWNVOTE");
+        if (TaskUtil.isNetworkAvailable(this)) {
+            if (param.equals("upvote")) {
+                ApiService.getInstance(this).post(this, Constants.BASE_URL + "upvote/event/", data, "UPVOTE");
+            } else {
+                ApiService.getInstance(this).post(this, Constants.BASE_URL + "downvote/event/", data, "DOWNVOTE");
+            }
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -611,7 +625,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        ApiService.getInstance(this).post(this, Constants.BASE_URL + "start/trip/", data, "STARTTRIP");
+        if (TaskUtil.isNetworkAvailable(this)) {
+                ApiService.getInstance(this).post(this, Constants.BASE_URL + "start/trip/", data, "STARTTRIP");
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -622,7 +641,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        ApiService.getInstance(this).post(this, Constants.BASE_URL + "check/event/", data, "CHECKTRIP");
+        if (TaskUtil.isNetworkAvailable(this)) {
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "check/event/", data, "CHECKTRIP");
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Internet is not vailable", Toast.LENGTH_LONG).show();
+        }
     }
 
 
