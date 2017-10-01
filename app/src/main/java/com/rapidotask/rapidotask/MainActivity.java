@@ -556,13 +556,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG, "checkpoints: ");
         LatLng current = StorageUtil.getInstance(this).getLocation(StorageUtil.SOURCE_LATLONG);
         List<Events> tempArray = StorageUtil.getInstance(this).getEvents();
-        for (int i = 0; i < tempArray.size(); i++) {
-            if (tempArray.get(i).getLocation().latitude == current.latitude &&
-                    tempArray.get(i).getLocation().longitude == current.longitude) {
-                NotifUtil.NotifyForVote(tempArray.get(i).getEventKey(), this);
-                tempArray.remove(i);
-                StorageUtil.getInstance(this).putEvents(tempArray);
-                break;
+        if (tempArray != null) {
+            for (int i = 0; i < tempArray.size(); i++) {
+                if (tempArray.get(i).getLocation().latitude == current.latitude &&
+                        tempArray.get(i).getLocation().longitude == current.longitude) {
+                    NotifUtil.NotifyForVote(tempArray.get(i).getEventKey(), this);
+                    tempArray.remove(i);
+                    StorageUtil.getInstance(this).putEvents(tempArray);
+                    break;
+                }
             }
         }
         updateEvent(StorageUtil.getInstance(this).getEvents());
