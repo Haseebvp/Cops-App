@@ -4,18 +4,22 @@ package com.rapidotask.rapidotask;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +32,7 @@ import android.widget.Toast;
 import com.android.volley.VolleyError;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdate;
@@ -106,16 +111,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (Exception e) {
 
         }
+        try {
+            String msg = intent.getStringExtra("voteparam");
+            String eventKey = intent.getStringExtra("key");
+            if (msg.equals("vote")) {
+                SHowVoteDialog(eventKey);
+            }
+            NotifUtil.CancelNotif(0, this);
+
+        } catch (Exception e) {
+
+        }
 
         try {
             String msg = intent.getStringExtra("message");
             if (msg.length() > 0) {
                 updateEvent(StorageUtil.getInstance(this).getEvents());
-                NotifUtil.CancelNotif(0,this);
+                NotifUtil.CancelNotif(0, this);
             }
         } catch (Exception e) {
 
         }
+    }
+
+    private void SHowVoteDialog(final String key) {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(this);
+        }
+        builder.setTitle("Update")
+                .setMessage("Vote for police alert!")
+                .setPositiveButton("True", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                        Vote("upvote", key);
+                    }
+                })
+                .setNegativeButton("False", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Vote("downvote", key);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     private void retainSavedData() {
@@ -210,7 +250,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 5, this);
+
+        Criteria criteria = new Criteria();
+//        criteria.setAccuracy(Criteria);
+        String provider = locationManager.getBestProvider(criteria, true);
+        locationManager.requestLocationUpdates(provider, 2000, 5, this);
 
 
     }
@@ -313,8 +357,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 s_marker = mMap.addMarker(s_markeroptions);
                 s_marker.setPosition(latLng);
                 StorageUtil.getInstance(this).putLocation(latLng, StorageUtil.SOURCE_LATLONG);
+
             } else {
                 if (StorageUtil.getInstance(this).getTripStatus()) {
+
                     if (c_marker == null) {
                         c_marker = mMap.addMarker(c_markeroptions);
                         c_marker.setPosition(latLng);
@@ -330,6 +376,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if (d_marker == null) {
                 AnimateCamera(latLng);
+            }
+        } else {
+            if (s_marker == null) {
+                StorageUtil.getInstance(this).putLocation(latLng, StorageUtil.SOURCE_LATLONG);
+
+            } else {
+                if (StorageUtil.getInstance(this).getTripStatus()) {
+                    StorageUtil.getInstance(this).putLocation(latLng, StorageUtil.CURRENT_LATLONG);
+                    checkpoints();
+                } else {
+                    StorageUtil.getInstance(this).putLocation(latLng, StorageUtil.SOURCE_LATLONG);
+                }
             }
         }
     }
@@ -394,8 +452,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if (TaskUtil.isNetworkAvailable(this)) {
                 ApiService.getInstance(this).post(this, Constants.BASE_URL + "stop/trip/", data, "STOPTRIP");
-            }
-            else {
+            } else {
                 Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
             }
 
@@ -432,8 +489,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG) != null) {
                 data.put("latitude", StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG).latitude);
                 data.put("longitude", StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG).longitude);
-            }
-            else {
+            } else {
                 data.put("latitude", StorageUtil.getInstance(this).getLocation(StorageUtil.SOURCE_LATLONG).latitude);
                 data.put("longitude", StorageUtil.getInstance(this).getLocation(StorageUtil.SOURCE_LATLONG).longitude);
 
@@ -443,8 +499,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (TaskUtil.isNetworkAvailable(this)) {
             ApiService.getInstance(this).post(this, Constants.BASE_URL + "create/event/", data, "CREATEEVENT");
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
         }
     }
@@ -464,8 +519,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 ApiService.getInstance(this).post(this, Constants.BASE_URL + "downvote/event/", data, "DOWNVOTE");
             }
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
         }
     }
@@ -577,7 +631,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void checkpoints() {
         Log.d(TAG, "checkpoints: ");
-        LatLng current = StorageUtil.getInstance(this).getLocation(StorageUtil.SOURCE_LATLONG);
+        LatLng current = StorageUtil.getInstance(this).getLocation(StorageUtil.CURRENT_LATLONG);
         List<Events> tempArray = StorageUtil.getInstance(this).getEvents();
         if (tempArray != null) {
             for (int i = 0; i < tempArray.size(); i++) {
@@ -590,7 +644,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
-        updateEvent(StorageUtil.getInstance(this).getEvents());
+        if (!isPaused) {
+            updateEvent(StorageUtil.getInstance(this).getEvents());
+        }
 
     }
 
@@ -626,9 +682,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
         if (TaskUtil.isNetworkAvailable(this)) {
-                ApiService.getInstance(this).post(this, Constants.BASE_URL + "start/trip/", data, "STARTTRIP");
-        }
-        else {
+            ApiService.getInstance(this).post(this, Constants.BASE_URL + "start/trip/", data, "STARTTRIP");
+        } else {
             Toast.makeText(getApplicationContext(), "Internet is not available", Toast.LENGTH_LONG).show();
         }
     }
@@ -643,8 +698,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (TaskUtil.isNetworkAvailable(this)) {
             ApiService.getInstance(this).post(this, Constants.BASE_URL + "check/event/", data, "CHECKTRIP");
-        }
-        else {
+        } else {
             Toast.makeText(getApplicationContext(), "Internet is not vailable", Toast.LENGTH_LONG).show();
         }
     }
@@ -719,8 +773,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             String status = object.optString("status");
             if (status.equals("OK")) {
                 Toast.makeText(getApplicationContext(), "Cops alert recorded...", Toast.LENGTH_SHORT).show();
+                CheckEvent();
+
             } else {
-                Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Server errror", Toast.LENGTH_SHORT).show();
 
             }
         } else if (flag.equals("STOPTRIP")) {

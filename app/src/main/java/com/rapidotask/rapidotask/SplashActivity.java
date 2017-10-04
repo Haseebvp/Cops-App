@@ -140,25 +140,26 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
     //    Api call
     private void registerDevice() {
         progress.setVisibility(View.VISIBLE);
-        if (StorageUtil.getInstance(this).getSession() == null) {
-            JSONObject data = new JSONObject();
-            try {
-                data.put("device_id", TaskUtil.getDeviceId(this));
-                data.put("device_type_id", TaskUtil.getDeviceId(this));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "gettoken/", data, "GETTOKEN");
-        } else {
-            JSONObject data = new JSONObject();
-            try {
-                data.put("device_id", MyFirebaseInstanceIDService.id_device);
-                data.put("device_type_id", StorageUtil.getInstance(this).getFirebase());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "updatetoken/", data, "UpdateTOKEN");
+        JSONObject data = new JSONObject();
+        try {
+            data.put("device_id", TaskUtil.getDeviceId(this));
+            data.put("device_type_id", TaskUtil.getDeviceId(this));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        ApiService.getInstance(this).post(this, Constants.BASE_URL + "gettoken/", data, "GETTOKEN");
+
+    }
+
+    private void updateToken() {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("device_id", MyFirebaseInstanceIDService.id_device);
+            data.put("device_type_id", StorageUtil.getInstance(this).getFirebase());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ApiService.getInstance(this).post(this, Constants.BASE_URL + "updatetoken/", data, "UpdateTOKEN");
     }
 
 
@@ -166,7 +167,6 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
 
     @Override
     public void onSuccess(JSONObject object, String flag) {
-        progress.setVisibility(View.GONE);
         Log.d(TAG, "onSuccess: " + object);
         if (flag.equals("GETTOKEN")) {
             try {
@@ -176,7 +176,8 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
                     int id = object.getInt("device");
                     MyFirebaseInstanceIDService.id_device = id;
                     StorageUtil.getInstance(this).putSession(token);
-                    GoToMain1page();
+                    updateToken();
+//                    GoToMain1page();
                 } else {
                     Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
                 }
@@ -186,6 +187,7 @@ public class SplashActivity extends AppCompatActivity implements ApiCommunicatio
                 Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
             }
         } else if (flag.equals("UpdateTOKEN")) {
+            progress.setVisibility(View.GONE);
             String status = object.optString("status");
             if (status.equals("OK")) {
                 GoToMain1page();

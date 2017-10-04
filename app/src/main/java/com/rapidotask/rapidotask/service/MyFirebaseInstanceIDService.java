@@ -1,5 +1,6 @@
 package com.rapidotask.rapidotask.service;
 
+import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -39,26 +40,21 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService imple
     private void sendRegistrationToServer(final String token) {
         Log.d(TAG, "sendRegistrationToServer: " + token);
 
-        if (StorageUtil.getInstance(this).getSession() == null) {
-            JSONObject data = new JSONObject();
-            try {
-                data.put("device_id", TaskUtil.getDeviceId(this));
-                data.put("device_type_id", token);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            StorageUtil.getInstance(this).putFirebase(token);
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "gettoken/", data, "GETTOKEN");
-        } else {
-            JSONObject data = new JSONObject();
-            try {
-                data.put("device_id", MyFirebaseInstanceIDService.id_device);
-                data.put("device_type_id", StorageUtil.getInstance(this).getFirebase());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            ApiService.getInstance(this).post(this, Constants.BASE_URL + "updatetoken/", data, "UpdateTOKEN");
+        if (id_device > 0) {
+            updateToke(token);
         }
+    }
+
+    private void updateToke(String token) {
+
+        JSONObject data = new JSONObject();
+        try {
+            data.put("device_id", MyFirebaseInstanceIDService.id_device);
+            data.put("device_type_id", StorageUtil.getInstance(this).getFirebase());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ApiService.getInstance(this).post(this, Constants.BASE_URL + "updatetoken/", data, "UpdateTOKEN");
     }
 
     private void storeRegIdInPref(String token) {
@@ -84,8 +80,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService imple
 
                 Toast.makeText(getApplicationContext(), "Server error", Toast.LENGTH_SHORT).show();
             }
-        }
-        else if (flag.equals("UpdateTOKEN")){
+        } else if (flag.equals("UpdateTOKEN")) {
             String status = object.optString("status");
             if (status.equals("OK")) {
 

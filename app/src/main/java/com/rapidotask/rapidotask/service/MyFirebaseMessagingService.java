@@ -66,23 +66,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             data.add(event);
             StorageUtil.getInstance(this).putEvents(data);
 
-            if (!NotifUtil.isAppIsInBackground(getApplicationContext())) {
-                Toast.makeText(this, body, Toast.LENGTH_LONG).show();
-
-                Intent intent = new Intent("Firebase");
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
-                NotifUtil.playNotificationSound(this);
-
-
-            } else {
+//            if (!NotifUtil.isAppIsInBackground(getApplicationContext())) {
+//                Toast.makeText(this, body, Toast.LENGTH_LONG).show();
+//
+//                Intent intent = new Intent("Firebase");
+//                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//
+//                NotifUtil.playNotificationSound(this);
+//
+//
+//            } else {
                 // app is in background, show the notification in notification tray
                 Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
                 PendingIntent dIntent = PendingIntent.getActivity(getApplicationContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 resultIntent.putExtra("message", message);
                 NotifUtil.showNotification(this, message, body, dIntent);
-            }
+//            }
         } catch (JSONException e) {
             Log.e(TAG, "Json Exception: " + e.getMessage());
         } catch (Exception e) {

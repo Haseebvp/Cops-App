@@ -40,8 +40,13 @@ public class NotifUtil {
         downVote.putExtra("param", "downvote");
         downVote.setAction("downvote");
 
+        Intent Vote = new Intent(context, MainActivity.class);
+        downVote.putExtra("key", eventKey);
+        downVote.putExtra("voteparam", "vote");
+
         PendingIntent uIntent = PendingIntent.getActivity(context.getApplicationContext(), 0, upVote, PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent dIntent = PendingIntent.getActivity(context.getApplicationContext(), 0, downVote, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent vIntent = PendingIntent.getActivity(context.getApplicationContext(), 0, Vote, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Action action1 = new NotificationCompat.Action.Builder(R.drawable.ic_upvote, "upvote", uIntent).build();
         NotificationCompat.Action action2 = new NotificationCompat.Action.Builder(R.drawable.ic_downvote, "downvote", dIntent).build();
@@ -50,6 +55,7 @@ public class NotifUtil {
         builder.setSmallIcon(android.R.drawable.ic_dialog_alert);
         builder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round));
         builder.setContentTitle("Rapido update!");
+        builder.setContentIntent(vIntent);
         builder.setStyle(new NotificationCompat.InboxStyle());
         builder.setWhen(System.currentTimeMillis());
         builder.setContentText("Record your votes...");
